@@ -32,6 +32,7 @@
 #include <sys/proc.h>
 #include <sys/module.h>
 #include <sys/sysent.h>
+#include <sys/sysproto.h>
 #include <sys/kernel.h>
 #include <sys/systm.h>
 #include <sys/queue.h>
@@ -77,8 +78,8 @@ process_hiding(struct thread *td, void *syscall_args)
 
 /* The sysent for the new system call. */
 static struct sysent process_hiding_sysent = {
-	1,			/* number of arguments */
-	process_hiding		/* implementing function */
+	.sy_narg = 1,			/* number of arguments */
+	.sy_call = process_hiding	/* implementing function */
 };
 
 /* The offset in sysent[] where the system call is to be allocated. */
