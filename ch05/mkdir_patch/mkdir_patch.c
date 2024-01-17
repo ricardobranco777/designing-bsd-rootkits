@@ -32,9 +32,12 @@
 #include <limits.h>
 #include <nlist.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <sys/param.h>
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <sys/module.h>
+#include <unistd.h>
 
 /* Kernel memory allocation (kmalloc) function code. */
 unsigned char kmalloc[] =

@@ -1,4 +1,6 @@
 
+all:	default
+
 default: mkdir_patch
 
 clean:
