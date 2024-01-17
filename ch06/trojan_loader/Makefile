@@ -1,4 +1,6 @@
 
+all:	default
+
 default: trojan_loader
 
 clean:
