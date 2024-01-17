@@ -1,4 +1,3 @@
-CC=gcc
 
 default: kmalloc_reloaded
 
