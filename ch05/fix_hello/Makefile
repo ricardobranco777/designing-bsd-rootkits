@@ -1,4 +1,6 @@
 
+all:	default
+
 default: fix_hello
 
 clean:

@@ -32,6 +32,7 @@
 #include <limits.h>
 #include <nlist.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
 
 #define SIZE	0x30
