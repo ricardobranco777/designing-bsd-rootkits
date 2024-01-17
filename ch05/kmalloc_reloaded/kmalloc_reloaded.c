@@ -32,9 +32,12 @@
 #include <limits.h>
 #include <nlist.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <sys/param.h>
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <sys/module.h>
+#include <unistd.h>
 
 /* Kernel memory allocation (kmalloc) function code. */
 unsigned char kmalloc[] =
@@ -136,7 +139,7 @@ main(int argc, char *argv[])
 
 	/* Allocate kernel memory. */
 	syscall(136, (unsigned long)atoi(argv[1]), &addr);
-	printf("Address of allocated kernel memory: 0x%x\n", addr);
+	printf("Address of allocated kernel memory: 0x%lx\n", addr);
 
 	/* Restore mkdir. */
 	if (kvm_write(kd, nl[0].n_value, mkdir_code, sizeof(kmalloc)) < 0) {

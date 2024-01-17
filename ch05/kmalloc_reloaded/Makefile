@@ -1,4 +1,6 @@
 
+all:	default
+
 default: kmalloc_reloaded
 
 clean:
