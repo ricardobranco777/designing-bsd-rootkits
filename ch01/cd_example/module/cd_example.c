@@ -157,7 +157,7 @@ read(struct cdev *dev, struct uio *uio, int ioflag)
 		error = -1;
 	else
 		/* Return the saved character string to userland. */
-		copystr(&buf, uio->uio_iov->iov_base, 513, &len);
+		copystr((const char *)&buf, uio->uio_iov->iov_base, 513, &len);
 
 	return(error);
 }
