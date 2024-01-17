@@ -1,5 +1,5 @@
 PROG=	rollback
-NO_MAN=	noman
+MK_MAN=	no
 
 install:
 

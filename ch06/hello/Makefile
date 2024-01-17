@@ -1,5 +1,5 @@
 PROG=	hello
-NO_MAN=	noman
+MK_MAN=	no
 
 install:
 

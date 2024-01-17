@@ -1,5 +1,5 @@
 PROG=	interface
-NO_MAN=	noman
+MK_MAN=	no
 
 install:
 

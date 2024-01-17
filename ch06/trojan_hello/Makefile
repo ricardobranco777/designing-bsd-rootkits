@@ -1,5 +1,5 @@
 PROG=	trojan_hello
-NO_MAN=	noman
+MK_MAN=	no
 
 install:
 
