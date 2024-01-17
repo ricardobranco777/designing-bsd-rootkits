@@ -39,8 +39,6 @@
 
 #include <fs/devfs/devfs_int.h>
 
-extern TAILQ_HEAD(,cdev_priv) cdevp_list;
-
 d_read_t	read_hook;
 d_read_t	*read;
 
