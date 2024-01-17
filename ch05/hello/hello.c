@@ -32,6 +32,7 @@
 #include <sys/proc.h>
 #include <sys/module.h>
 #include <sys/sysent.h>
+#include <sys/sysproto.h>
 #include <sys/kernel.h>
 #include <sys/systm.h>
 
@@ -48,8 +49,8 @@ hello(struct thread *td, void *syscall_args)
 
 /* The sysent for the new system call. */
 static struct sysent hello_sysent = {
-	0,			/* number of arguments */
-	hello			/* implementing function */
+	.sy_narg = 0,			/* number of arguments */
+	.sy_call = hello		/* implementing function */
 };
 
 /* The offset in sysent[] where the system call is to be allocated. */
