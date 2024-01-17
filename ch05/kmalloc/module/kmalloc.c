@@ -32,6 +32,7 @@
 #include <sys/proc.h>
 #include <sys/module.h>
 #include <sys/sysent.h>
+#include <sys/sysproto.h>
 #include <sys/kernel.h>
 #include <sys/systm.h>
 #include <sys/malloc.h>
@@ -49,9 +50,9 @@ kmalloc(struct thread *td, void *syscall_args)
 	uap = (struct kmalloc_args *)syscall_args;
 
 	int error;
-	unsigned long addr;
+	void *addr;
 
-	MALLOC(addr, unsigned long, uap->size, M_TEMP, M_NOWAIT);
+	addr = malloc(uap->size, M_TEMP, M_NOWAIT);
 	error = copyout(&addr, uap->addr, sizeof(addr));
 
 	return(error);
@@ -59,8 +60,8 @@ kmalloc(struct thread *td, void *syscall_args)
 
 /* The sysent for the new system call. */
 static struct sysent kmalloc_sysent = {
-	2,			/* number of arguments */
-	kmalloc			/* implementing function */
+	.sy_narg = 2,			/* number of arguments */
+	.sy_call = kmalloc		/* implementing function */
 };
 
 /* The offset in sysent[] where the system call is to be allocated. */

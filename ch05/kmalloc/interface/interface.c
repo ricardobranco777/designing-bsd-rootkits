@@ -28,9 +28,12 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <sys/param.h>
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <sys/module.h>
+#include <unistd.h>
 
 int
 main(int argc, char *argv[])
@@ -50,7 +53,7 @@ main(int argc, char *argv[])
 	syscall_num = stat.data.intval;
 
 	syscall(syscall_num, (unsigned long)atoi(argv[1]), &addr);
-	printf("Address of allocated kernel memory: 0x%x\n", addr);
+	printf("Address of allocated kernel memory: 0x%lx\n", addr);
 
 	exit(0);
 }
