@@ -1,0 +1,4 @@
+**/*.depend
+**/*.ko
+**/*.o
+**/opt_global.h
