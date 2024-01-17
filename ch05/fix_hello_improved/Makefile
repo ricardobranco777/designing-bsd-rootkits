@@ -1,4 +1,5 @@
 
+all:	default
 default: fix_hello_improved
 
 clean:
