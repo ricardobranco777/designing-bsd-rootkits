@@ -43,15 +43,18 @@
 
 #define TRIGGER "Shiny."
 
-extern struct protosw inetsw[];
-pr_input_t icmp_input_hook;
+extern ipproto_input_t *ip_protox[];
+
+ipproto_input_t icmp_input_hook;
 
 /* icmp_input hook. */
-void
-icmp_input_hook(struct mbuf *m, int off)
+int
+icmp_input_hook(struct mbuf **mp, int *off, int proto)
 {
+	struct mbuf *m = *mp;
 	struct icmp *icp;
-	int hlen = off;
+	int hlen = *off;
+	int error = 0;
 
 	/* Locate the ICMP message within m. */
 	m->m_len -= hlen;
@@ -70,7 +73,8 @@ icmp_input_hook(struct mbuf *m, int off)
 	    strncmp(icp->icmp_data, TRIGGER, 6) == 0)
 		printf("Let's be bad guys.\n");
 	else
-		icmp_input(m, off);
+		error = icmp_input(mp, off, IPPROTO_ICMP);
+	return (error);
 }
 
 /* The function called at load/unload. */
@@ -82,12 +86,12 @@ load(struct module *module, int cmd, void *arg)
 	switch (cmd) {
 	case MOD_LOAD:
 		/* Replace icmp_input with icmp_input_hook. */
-		inetsw[ip_protox[IPPROTO_ICMP]].pr_input = icmp_input_hook;
+		ip_protox[IPPROTO_ICMP] = icmp_input_hook;
 		break;
 
 	case MOD_UNLOAD:
 		/* Change everything back to normal. */
-		inetsw[ip_protox[IPPROTO_ICMP]].pr_input = icmp_input;
+		ip_protox[IPPROTO_ICMP] = icmp_input;
 		break;
 
 	default:
