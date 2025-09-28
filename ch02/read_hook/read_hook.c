@@ -62,7 +62,9 @@ read_hook(struct thread *td, void *syscall_args)
 	if (error || (!uap->nbyte) || (uap->nbyte > 1) || (uap->fd != 0))
 		return(error);
 
-	copyinstr(uap->buf, buf, 1, &done);
+	error = copyinstr(uap->buf, buf, 1, &done);
+	if (error)
+		return(error);
 	printf("%c\n", buf[0]);
 
 	return(error);
